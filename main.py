@@ -1,8 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-
-# # TODO check and research
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -38,7 +36,7 @@ class InternetSpeedTwitterBot:
         self.up = 0
         self.down = 0
 
-        # self.up_speed, self.down_speed = 50, 50
+        # self.up_speed, self.down_speed = 50, 50  # debugger
         self.down_speed, self.up_speed = self.get_internet_speed()
 
     def get_internet_speed(self):
@@ -68,7 +66,7 @@ class InternetSpeedTwitterBot:
 
     def log_in_twitter(self):
         self.driver.get(self.X_URL)
-        wait = WebDriverWait(self.driver, 105)  # Wait up to 10 seconds
+        wait = WebDriverWait(self.driver, 105)  # Wait up to 15 seconds
 
         time.sleep(3)
 
@@ -77,12 +75,13 @@ class InternetSpeedTwitterBot:
                                                                '//*[@id="react-root"]/div/div/div[2]/main/div/div/div[1]/div[1]/div/div[3]/div[3]/a/div/span')))
             self.driver.execute_script("arguments[0].scrollIntoView(true);", x_sign_in)  # Scroll into view
             time.sleep(1)
-            self.driver.execute_script("arguments[0].click();", x_sign_in)  # Use JS to click
+            self.driver.execute_script("arguments[0].click();", x_sign_in)  # Use JS to click because can't access o therwise
             time.sleep(1)
             x_sign_in.click()
         except Exception as e:
             print(f"Failed to click sign in: {e}")
 
+        # TODO Enter Email
         try:
             email = wait.until(
                 EC.element_to_be_clickable((By.XPATH,
@@ -92,6 +91,7 @@ class InternetSpeedTwitterBot:
         except Exception as e:
             print(f"Failed to type email: {e}")
 
+        # TODO Enter Username if prompted -- THIS DOESN'T WORK! :(
         try:
             username = wait.until(
                 EC.element_to_be_clickable((By.XPATH,
@@ -101,6 +101,7 @@ class InternetSpeedTwitterBot:
         except Exception as e:
             print(f"Failed to type email: {e}")
 
+        # TODO Enter Password
         try:
             password = wait.until(
                 EC.element_to_be_clickable((By.XPATH,
@@ -110,6 +111,7 @@ class InternetSpeedTwitterBot:
         except Exception as e:
             print(f"Failed to type password: {e}")
 
+        # TODO Click close 2FA if it asks for this
         try:
             close_2fa = wait.until(
                 EC.element_to_be_clickable((By.XPATH,
@@ -124,6 +126,7 @@ class InternetSpeedTwitterBot:
     def tweet_at_provider(self):
         wait = WebDriverWait(self.driver, 10)  # Wait up to 10 seconds
 
+        # TODO Set up the message
         if self.up_speed < 37 or self.down_speed < 37:
             tweet = (
                 f"Hey @{INTERNET_PROVIDER}, why is my internet speed {self.down_speed} Mpbs down/{self.up_speed} Mpbs up when I pay for \""
@@ -132,6 +135,8 @@ class InternetSpeedTwitterBot:
             tweet = (f"Hey @{INTERNET_PROVIDER}, good job! My internet speed is {self.down_speed} Mbps down/{self.up_speed} Mbps up against \""
                      f"the promised speed of {PROMISED_DOWN} Mbps down/{PROMISED_UP} Mbps up!")
 
+
+        # TODO Compose the tweet
         try:
             compose_tweet = wait.until(
                 EC.element_to_be_clickable(((By.XPATH,
@@ -142,6 +147,8 @@ class InternetSpeedTwitterBot:
         except Exception as e:
             print(f"Failed to click on the close 2FA button: {e}")
 
+
+        # TODO Click Post! :D
         try:
             send_tweet = wait.until(EC.element_to_be_clickable((By.XPATH,
                                                                 '//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div[1]/div/div[3]/div/div[2]/div[1]/div/div/div/div[2]/div[2]/div[2]/div/div/div/button')))
@@ -152,6 +159,5 @@ class InternetSpeedTwitterBot:
 
 
 internet_speed_bot = InternetSpeedTwitterBot()
-# internet_speed_bot.get_internet_speed()
 internet_speed_bot.log_in_twitter()
 internet_speed_bot.tweet_at_provider()
